@@ -1,0 +1,24 @@
+<div class="js-pseudo-modal-template">
+    <div class="modal fade"
+         tabindex="-1"
+         role="dialog">
+        <div class="modal-dialog"
+             role="document">
+            <div class="modal-content">
+                <div class="modal-header only-close">
+                    <div class="modal-title js-pseudo-modal-template-title-element h5"></div>
+
+                    <button type="button"
+                            class="btn-close close"
+                            data-bs-dismiss="modal"
+                            aria-label="Close">
+                        {% block product_detail_zoom_modal_close_button_content %}
+                        {% endblock %}
+                    </button>
+                </div>
+                <div class="modal-body js-pseudo-modal-template-content-element">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

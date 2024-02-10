@@ -1,0 +1,529 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <parameters>
+        <parameter key="shopware.twig.app_variable.allowed_server_params" type="collection">
+            <parameter>server_name</parameter>
+            <parameter>request_uri</parameter>
+            <parameter>app_url</parameter>
+            <parameter>http_user_agent</parameter>
+            <parameter>http_host</parameter>
+            <parameter>server_name</parameter>
+            <parameter>server_port</parameter>
+            <parameter>redirect_url</parameter>
+            <parameter>https</parameter>
+            <parameter>forwarded</parameter>
+            <parameter>host</parameter>
+            <parameter>remote_addr</parameter>
+            <parameter>http_x_forwarded_for</parameter>
+            <parameter>http_x_forwarded_host</parameter>
+            <parameter>http_x_forwarded_proto</parameter>
+            <parameter>http_x_forwarded_port</parameter>
+            <parameter>http_x_forwarded_prefix</parameter>
+        </parameter>
+    </parameters>
+
+    <services>
+        <defaults autowire="true"/>
+
+        <!-- Checkout -->
+        <service id="Shopware\Storefront\Checkout\Cart\SalesChannel\StorefrontCartFacade">
+            <argument type="service" id="Shopware\Core\Checkout\Cart\SalesChannel\CartService"/>
+            <argument type="service" id="Shopware\Storefront\Checkout\Shipping\BlockedShippingMethodSwitcher"/>
+            <argument type="service" id="Shopware\Storefront\Checkout\Payment\BlockedPaymentMethodSwitcher"/>
+            <argument type="service" id="Shopware\Core\System\SalesChannel\SalesChannel\ContextSwitchRoute"/>
+            <argument type="service" id="Shopware\Core\Checkout\Cart\CartCalculator"/>
+            <argument type="service" id="Shopware\Core\Checkout\Cart\CartPersister"/>
+        </service>
+
+        <service id="Shopware\Storefront\Checkout\Shipping\BlockedShippingMethodSwitcher">
+            <argument type="service" id="Shopware\Core\Checkout\Shipping\SalesChannel\ShippingMethodRoute"/>
+        </service>
+
+        <service id="Shopware\Storefront\Checkout\Payment\BlockedPaymentMethodSwitcher">
+            <argument type="service" id="Shopware\Core\Checkout\Payment\SalesChannel\PaymentMethodRoute"/>
+        </service>
+
+        <service id="Shopware\Storefront\Framework\Routing\CachedDomainLoader" decorates="Shopware\Storefront\Framework\Routing\DomainLoader" decoration-priority="-1000">
+            <argument type="service" id="Shopware\Storefront\Framework\Routing\CachedDomainLoader.inner"/>
+            <argument type="service" id="cache.object"/>
+            <argument type="service" id="logger"/>
+        </service>
+
+        <service id="Shopware\Storefront\Framework\Routing\CachedDomainLoaderInvalidator">
+            <argument type="service" id="Shopware\Core\Framework\Adapter\Cache\CacheInvalidator"/>
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+        <service id="Shopware\Storefront\Framework\Routing\DomainLoader">
+            <argument type="service" id="Doctrine\DBAL\Connection"/>
+        </service>
+
+        <service id="Shopware\Storefront\Framework\Routing\RequestTransformer"
+                 decorates="Shopware\Core\Framework\Routing\RequestTransformerInterface">
+
+            <argument type="service" id="Shopware\Storefront\Framework\Routing\RequestTransformer.inner"/>
+            <argument type="service" id="Shopware\Core\Content\Seo\SeoResolver"/>
+            <argument>%shopware.routing.registered_api_prefixes%</argument>
+            <argument type="service" id="Shopware\Storefront\Framework\Routing\DomainLoader"/>
+        </service>
+
+        <service id="Shopware\Storefront\Framework\Routing\Router" decorates="router">
+            <argument type="service" id="Shopware\Storefront\Framework\Routing\Router.inner"/>
+            <argument type="service" id="request_stack"/>
+        </service>
+
+        <service id="Shopware\Storefront\Framework\Routing\MaintenanceModeResolver">
+            <argument type="service" id="request_stack"/>
+            <argument type="service" id="Shopware\Core\Framework\Routing\MaintenanceModeResolver"/>
+        </service>
+
+        <service id="Shopware\Storefront\Framework\Routing\StorefrontRouteScope">
+            <tag name="shopware.route_scope"/>
+        </service>
+
+        <service id="Shopware\Storefront\Framework\Twig\TemplateDataExtension">
+            <argument type="service" id="request_stack"/>
+            <tag name="twig.extension"/>
+        </service>
+
+        <service id="Shopware\Storefront\Framework\Twig\TemplateConfigAccessor">
+            <argument type="service" id="Shopware\Core\System\SystemConfig\SystemConfigService"/>
+            <argument type="service" id="Shopware\Storefront\Theme\ThemeConfigValueAccessor"/>
+            <argument type="service" id="Shopware\Storefront\Theme\ThemeScripts" />
+        </service>
+
+        <service id="Shopware\Storefront\Theme\ThemeConfigValueAccessor">
+            <argument type="service" id="Shopware\Storefront\Theme\ResolvedConfigLoader"/>
+            <argument>%shopware.cache.tagging.each_theme_config%</argument>
+        </service>
+
+        <service id="Shopware\Storefront\Framework\Twig\Extension\ConfigExtension">
+            <argument type="service" id="Shopware\Storefront\Framework\Twig\TemplateConfigAccessor"/>
+            <tag name="twig.extension"/>
+        </service>
+
+        <service id="Shopware\Storefront\Framework\Twig\IconExtension">
+            <tag name="twig.extension"/>
+        </service>
+
+        <service id="Shopware\Storefront\Framework\Twig\ThumbnailExtension">
+            <argument type="service" id="Shopware\Core\Framework\Adapter\Twig\TemplateFinder"/>
+
+            <tag name="twig.extension"/>
+        </service>
+
+        <service id="Shopware\Storefront\Framework\Twig\TwigDateRequestListener">
+            <argument type="service" id="service_container"/>
+            <tag name="kernel.event_listener" event="kernel.request"/>
+        </service>
+
+        <service id="Shopware\Storefront\Framework\Twig\ErrorTemplateResolver" public="false">
+            <argument type="service" id="twig"/>
+        </service>
+
+        <service id="Shopware\Storefront\Framework\Twig\Extension\UrlEncodingTwigFilter" public="false">
+            <tag name="twig.extension"/>
+        </service>
+
+        <service id="Shopware\Storefront\Framework\Twig\Extension\IconCacheTwigFilter" public="false">
+            <tag name="twig.extension"/>
+        </service>
+
+        <service id="Shopware\Core\System\Salutation\AbstractSalutationsSorter" class="Shopware\Core\System\Salutation\SalutationSorter"/>
+
+        <service id="Shopware\Storefront\Framework\Media\StorefrontMediaUploader">
+            <argument type="service" id="Shopware\Core\Content\Media\MediaService"/>
+            <argument type="service" id="Shopware\Core\Content\Media\File\FileSaver"/>
+            <argument type="service" id="Shopware\Storefront\Framework\Media\StorefrontMediaValidatorRegistry"/>
+        </service>
+
+        <service id="Shopware\Storefront\Framework\Media\StorefrontMediaValidatorRegistry" public="true">
+            <argument type="tagged" tag="storefront.media.upload.validator"/>
+        </service>
+
+        <service id="Shopware\Storefront\Framework\Media\Validator\StorefrontMediaImageValidator">
+            <tag name="storefront.media.upload.validator"/>
+        </service>
+
+        <service id="Shopware\Storefront\Framework\Media\Validator\StorefrontMediaDocumentValidator">
+            <tag name="storefront.media.upload.validator"/>
+        </service>
+
+        <service id="Shopware\Storefront\Framework\Routing\StorefrontSubscriber">
+            <argument type="service" id="request_stack"/>
+            <argument type="service" id="router"/>
+            <argument type="service" id="Shopware\Core\Content\Seo\HreflangLoaderInterface"/>
+            <argument type="service" id="Shopware\Storefront\Framework\Routing\MaintenanceModeResolver"/>
+            <argument type="service" id="Shopware\Core\Framework\App\ShopId\ShopIdProvider"/>
+            <argument type="service" id="Shopware\Core\Framework\App\ActiveAppsLoader"/>
+            <argument type="service" id="Shopware\Core\System\SystemConfig\SystemConfigService"/>
+            <argument type="service" id="Shopware\Storefront\Theme\StorefrontPluginRegistry"/>
+
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+        <service id="Shopware\Storefront\Framework\Routing\NotFound\NotFoundSubscriber">
+            <argument type="service" id="http_kernel"/>
+            <argument type="service" id="Shopware\Core\System\SalesChannel\Context\SalesChannelContextService"/>
+            <argument>%kernel.debug%</argument>
+            <argument type="service" id="cache.object"/>
+            <argument type="service" id="Shopware\Core\Framework\Adapter\Cache\CacheTracer"/>
+            <argument type="service" id="Shopware\Core\Framework\DataAbstractionLayer\Cache\EntityCacheKeyGenerator"/>
+            <argument type="service" id="Shopware\Core\Framework\Adapter\Cache\CacheInvalidator"/>
+            <argument type="service" id="event_dispatcher"/>
+
+            <tag name="kernel.event_subscriber"/>
+            <tag name="kernel.reset" method="reset"/>
+        </service>
+
+        <service id="Shopware\Storefront\Framework\AffiliateTracking\AffiliateTrackingListener">
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+        <service id="Shopware\Storefront\Page\Navigation\NavigationPageLoader">
+            <argument type="service" id="Shopware\Storefront\Page\GenericPageLoader"/>
+            <argument type="service" id="event_dispatcher"/>
+            <argument type="service" id="Shopware\Core\Content\Category\SalesChannel\CategoryRoute"/>
+            <argument type="service" id="Shopware\Core\Content\Seo\SeoUrlPlaceholderHandlerInterface"/>
+        </service>
+
+        <service id="Shopware\Storefront\Page\Navigation\Error\ErrorPageLoader">
+            <argument type="service" id="Shopware\Core\Content\Cms\SalesChannel\SalesChannelCmsPageLoader"/>
+            <argument type="service" id="Shopware\Storefront\Page\GenericPageLoader"/>
+            <argument type="service" id="event_dispatcher"/>
+        </service>
+
+        <service id="Shopware\Storefront\Page\Maintenance\MaintenancePageLoader">
+            <argument type="service" id="Shopware\Core\Content\Cms\SalesChannel\SalesChannelCmsPageLoader"/>
+            <argument type="service" id="Shopware\Storefront\Page\GenericPageLoader"/>
+            <argument type="service" id="event_dispatcher"/>
+        </service>
+
+        <service id="Shopware\Storefront\Page\LandingPage\LandingPageLoader">
+            <argument type="service" id="Shopware\Storefront\Page\GenericPageLoader"/>
+            <argument type="service" id="Shopware\Core\Content\LandingPage\SalesChannel\LandingPageRoute"/>
+            <argument type="service" id="event_dispatcher"/>
+        </service>
+
+        <service id="Shopware\Storefront\Pagelet\Menu\Offcanvas\MenuOffcanvasPageletLoader">
+            <argument type="service" id="event_dispatcher"/>
+            <argument type="service" id="Shopware\Core\Content\Category\Service\NavigationLoader"/>
+        </service>
+
+        <service id="Shopware\Storefront\Pagelet\Captcha\BasicCaptchaPageletLoader">
+            <argument type="service" id="event_dispatcher"/>
+            <argument type="service" id="Shopware\Storefront\Framework\Captcha\BasicCaptcha\BasicCaptchaGenerator"/>
+            <argument type="service" id="Shopware\Core\Content\Category\Service\NavigationLoader"/>
+        </service>
+
+        <service id="Shopware\Storefront\Pagelet\Country\CountryStateDataPageletLoader">
+            <argument type="service" id="Shopware\Core\System\Country\SalesChannel\CountryStateRoute"/>
+            <argument type="service" id="event_dispatcher"/>
+        </service>
+
+        <service id="Shopware\Storefront\Page\Suggest\SuggestPageLoader">
+            <argument type="service" id="event_dispatcher"/>
+            <argument type="service" id="Shopware\Core\Content\Product\SalesChannel\Suggest\ProductSuggestRoute"/>
+            <argument type="service" id="Shopware\Storefront\Page\GenericPageLoader"/>
+        </service>
+
+        <service id="Shopware\Storefront\Pagelet\Header\HeaderPageletLoader">
+            <argument type="service" id="event_dispatcher"/>
+            <argument type="service" id="Shopware\Core\System\Currency\SalesChannel\CurrencyRoute"/>
+            <argument type="service" id="Shopware\Core\System\Language\SalesChannel\LanguageRoute"/>
+            <argument type="service" id="Shopware\Core\Content\Category\Service\NavigationLoader"/>
+        </service>
+
+        <service id="Shopware\Storefront\Pagelet\Footer\FooterPageletLoader">
+            <argument type="service" id="event_dispatcher"/>
+            <argument type="service" id="Shopware\Core\Content\Category\Service\NavigationLoader"/>
+        </service>
+
+        <service id="Shopware\Storefront\Page\GenericPageLoader">
+            <argument type="service" id="Shopware\Storefront\Pagelet\Header\HeaderPageletLoader"/>
+            <argument type="service" id="Shopware\Storefront\Pagelet\Footer\FooterPageletLoader"/>
+            <argument type="service" id="Shopware\Core\System\SystemConfig\SystemConfigService"/>
+            <argument type="service" id="Shopware\Core\Checkout\Payment\SalesChannel\PaymentMethodRoute"/>
+            <argument type="service" id="Shopware\Core\Checkout\Shipping\SalesChannel\ShippingMethodRoute"/>
+            <argument type="service" id="event_dispatcher"/>
+        </service>
+
+        <service id="Shopware\Storefront\Page\Search\SearchPageLoader" public="true">
+            <argument type="service" id="Shopware\Storefront\Page\GenericPageLoader"/>
+            <argument type="service" id="Shopware\Core\Content\Product\SalesChannel\Search\ProductSearchRoute"/>
+            <argument type="service" id="event_dispatcher"/>
+        </service>
+
+        <service id="Shopware\Storefront\Page\Product\ProductPageLoader">
+            <argument type="service" id="Shopware\Storefront\Page\GenericPageLoader"/>
+            <argument type="service" id="event_dispatcher"/>
+            <argument type="service" id="Shopware\Core\Content\Product\SalesChannel\Detail\ProductDetailRoute"/>
+        </service>
+
+        <service id="Shopware\Storefront\Page\Product\QuickView\MinimalQuickViewPageLoader">
+            <argument type="service" id="event_dispatcher"/>
+            <argument type="service" id="Shopware\Core\Content\Product\SalesChannel\Detail\ProductDetailRoute"/>
+        </service>
+
+        <service id="Shopware\Storefront\Page\Product\Configurator\ProductPageConfiguratorLoader"
+                 decorates="Shopware\Core\Content\Product\SalesChannel\Detail\ProductConfiguratorLoader">
+
+            <argument type="service" id="Shopware\Storefront\Page\Product\Configurator\ProductPageConfiguratorLoader.inner"/>
+        </service>
+
+        <service id="Shopware\Storefront\Page\Checkout\Finish\CheckoutFinishPageLoader">
+            <argument type="service" id="event_dispatcher"/>
+            <argument type="service" id="Shopware\Storefront\Page\GenericPageLoader"/>
+            <argument type="service" id="Shopware\Core\Checkout\Order\SalesChannel\OrderRoute"/>
+        </service>
+
+        <service id="Shopware\Storefront\Page\Checkout\Confirm\CheckoutConfirmPageLoader">
+            <argument type="service" id="event_dispatcher"/>
+            <argument type="service" id="Shopware\Storefront\Checkout\Cart\SalesChannel\StorefrontCartFacade"/>
+            <argument type="service" id="Shopware\Core\Checkout\Shipping\SalesChannel\ShippingMethodRoute"/>
+            <argument type="service" id="Shopware\Core\Checkout\Payment\SalesChannel\PaymentMethodRoute"/>
+            <argument type="service" id="Shopware\Storefront\Page\GenericPageLoader"/>
+            <argument type="service" id="Shopware\Core\Checkout\Customer\Validation\AddressValidationFactory"/>
+            <argument type="service" id="Shopware\Core\Framework\Validation\DataValidator"/>
+        </service>
+
+        <service id="Shopware\Storefront\Page\Checkout\Cart\CheckoutCartPageLoader">
+            <argument type="service" id="Shopware\Storefront\Page\GenericPageLoader"/>
+            <argument type="service" id="event_dispatcher"/>
+            <argument type="service" id="Shopware\Storefront\Checkout\Cart\SalesChannel\StorefrontCartFacade"/>
+            <argument type="service" id="Shopware\Core\Checkout\Payment\SalesChannel\PaymentMethodRoute"/>
+            <argument type="service" id="Shopware\Core\Checkout\Shipping\SalesChannel\ShippingMethodRoute"/>
+            <argument type="service" id="Shopware\Core\System\Country\SalesChannel\CountryRoute"/>
+        </service>
+
+        <service id="Shopware\Storefront\Page\Checkout\Offcanvas\OffcanvasCartPageLoader">
+            <argument type="service" id="event_dispatcher"/>
+            <argument type="service" id="Shopware\Storefront\Checkout\Cart\SalesChannel\StorefrontCartFacade"/>
+            <argument type="service" id="Shopware\Storefront\Page\GenericPageLoader"/>
+            <argument type="service" id="Shopware\Core\Checkout\Shipping\SalesChannel\ShippingMethodRoute"/>
+        </service>
+
+        <service id="Shopware\Storefront\Page\Account\Profile\AccountProfilePageLoader">
+            <argument type="service" id="Shopware\Storefront\Page\GenericPageLoader"/>
+            <argument type="service" id="event_dispatcher"/>
+            <argument type="service" id="Shopware\Core\System\Salutation\SalesChannel\SalutationRoute"/>
+            <argument type="service" id="Shopware\Core\System\Salutation\AbstractSalutationsSorter"/>
+        </service>
+
+        <service id="Shopware\Storefront\Page\Account\PaymentMethod\AccountPaymentMethodPageLoader">
+            <argument type="service" id="Shopware\Storefront\Page\GenericPageLoader"/>
+            <argument type="service" id="event_dispatcher"/>
+        </service>
+
+        <service id="Shopware\Storefront\Page\Account\Overview\AccountOverviewPageLoader">
+            <argument type="service" id="Shopware\Storefront\Page\GenericPageLoader"/>
+            <argument type="service" id="event_dispatcher"/>
+            <argument type="service" id="Shopware\Core\Checkout\Order\SalesChannel\OrderRoute"/>
+            <argument type="service" id="Shopware\Core\Checkout\Customer\SalesChannel\CustomerRoute"/>
+            <argument type="service" id="Shopware\Storefront\Pagelet\Newsletter\Account\NewsletterAccountPageletLoader"/>
+        </service>
+
+        <service id="Shopware\Storefront\Page\Account\Order\AccountOrderPageLoader">
+            <argument type="service" id="Shopware\Storefront\Page\GenericPageLoader"/>
+            <argument type="service" id="event_dispatcher"/>
+            <argument type="service" id="Shopware\Core\Checkout\Order\SalesChannel\OrderRoute"/>
+            <argument type="service" id="Shopware\Core\Checkout\Customer\SalesChannel\AccountService"/>
+        </service>
+
+        <service id="Shopware\Storefront\Page\Account\Order\AccountOrderDetailPageLoader">
+            <argument type="service" id="Shopware\Storefront\Page\GenericPageLoader"/>
+            <argument type="service" id="event_dispatcher"/>
+            <argument type="service" id="Shopware\Core\Checkout\Order\SalesChannel\OrderRoute"/>
+        </service>
+
+        <service id="Shopware\Storefront\Page\Account\Order\AccountEditOrderPageLoader">
+            <argument type="service" id="Shopware\Storefront\Page\GenericPageLoader"/>
+            <argument type="service" id="event_dispatcher"/>
+            <argument type="service" id="Shopware\Core\Checkout\Order\SalesChannel\OrderRoute"/>
+            <argument type="service" id="Shopware\Core\Framework\DataAbstractionLayer\Search\RequestCriteriaBuilder"/>
+            <argument type="service" id="Shopware\Core\Checkout\Payment\SalesChannel\PaymentMethodRoute"/>
+            <argument type="service" id="Shopware\Core\Checkout\Cart\Order\OrderConverter"/>
+            <argument type="service" id="Shopware\Core\Checkout\Order\SalesChannel\OrderService"/>
+        </service>
+
+        <service id="Shopware\Storefront\Page\Account\Login\AccountLoginPageLoader">
+            <argument type="service" id="Shopware\Storefront\Page\GenericPageLoader"/>
+            <argument type="service" id="event_dispatcher"/>
+            <argument type="service" id="Shopware\Core\System\Country\SalesChannel\CountryRoute"/>
+            <argument type="service" id="Shopware\Core\System\Salutation\SalesChannel\SalutationRoute"/>
+            <argument type="service" id="Shopware\Core\System\Salutation\AbstractSalutationsSorter"/>
+        </service>
+
+        <service id="Shopware\Storefront\Page\Account\RecoverPassword\AccountRecoverPasswordPageLoader">
+            <argument type="service" id="Shopware\Storefront\Page\GenericPageLoader"/>
+            <argument type="service" id="event_dispatcher"/>
+            <argument type="service" id="Shopware\Core\Checkout\Customer\SalesChannel\CustomerRecoveryIsExpiredRoute"/>
+        </service>
+
+        <service id="Shopware\Storefront\Page\Account\CustomerGroupRegistration\CustomerGroupRegistrationPageLoader">
+            <argument type="service" id="Shopware\Storefront\Page\Account\Login\AccountLoginPageLoader"/>
+            <argument type="service" id="Shopware\Core\Checkout\Customer\SalesChannel\CustomerGroupRegistrationSettingsRoute"/>
+            <argument type="service" id="event_dispatcher"/>
+        </service>
+
+        <service id="Shopware\Storefront\Page\Checkout\Register\CheckoutRegisterPageLoader" public="true">
+            <argument type="service" id="Shopware\Storefront\Page\GenericPageLoader"/>
+            <argument type="service" id="Shopware\Core\Checkout\Customer\SalesChannel\ListAddressRoute"/>
+            <argument type="service" id="event_dispatcher"/>
+            <argument type="service" id="Shopware\Core\Checkout\Cart\SalesChannel\CartService"/>
+            <argument type="service" id="Shopware\Core\System\Salutation\SalesChannel\SalutationRoute"/>
+            <argument type="service" id="Shopware\Core\System\Country\SalesChannel\CountryRoute"/>
+        </service>
+
+        <service id="Shopware\Storefront\Page\Newsletter\Subscribe\NewsletterSubscribePageLoader">
+            <argument type="service" id="Shopware\Storefront\Page\GenericPageLoader"/>
+            <argument type="service" id="event_dispatcher"/>
+        </service>
+
+        <service id="Shopware\Storefront\Pagelet\Newsletter\Account\NewsletterAccountPageletLoader">
+            <argument type="service" id="event_dispatcher"/>
+            <argument type="service" id="Shopware\Core\Content\Newsletter\SalesChannel\NewsletterSubscribeRoute"/>
+            <argument type="service" id="Shopware\Core\Content\Newsletter\SalesChannel\NewsletterUnsubscribeRoute"/>
+            <argument type="service" id="Shopware\Core\Checkout\Customer\SalesChannel\AccountNewsletterRecipientRoute"/>
+            <argument type="service" id="Shopware\Core\Framework\Adapter\Translation\Translator"/>
+            <argument type="service" id="Shopware\Core\System\SystemConfig\SystemConfigService"/>
+        </service>
+
+        <service id="Shopware\Storefront\Page\Address\Detail\AddressDetailPageLoader">
+            <argument type="service" id="Shopware\Storefront\Page\GenericPageLoader"/>
+            <argument type="service" id="Shopware\Core\System\Country\SalesChannel\CountryRoute"/>
+            <argument type="service" id="Shopware\Core\System\Salutation\SalesChannel\SalutationRoute"/>
+            <argument type="service" id="event_dispatcher"/>
+            <argument type="service" id="Shopware\Core\Checkout\Customer\SalesChannel\ListAddressRoute"/>
+            <argument type="service" id="Shopware\Core\System\Salutation\AbstractSalutationsSorter"/>
+        </service>
+
+        <service id="Shopware\Storefront\Page\Address\Listing\AddressListingPageLoader">
+            <argument type="service" id="Shopware\Storefront\Page\GenericPageLoader"/>
+            <argument type="service" id="Shopware\Core\System\Country\SalesChannel\CountryRoute"/>
+            <argument type="service" id="Shopware\Core\System\Salutation\SalesChannel\SalutationRoute"/>
+            <argument type="service" id="Shopware\Core\Checkout\Customer\SalesChannel\ListAddressRoute"/>
+            <argument type="service" id="event_dispatcher"/>
+            <argument type="service" id="Shopware\Core\Checkout\Cart\SalesChannel\CartService"/>
+        </service>
+
+        <service id="Shopware\Storefront\Page\Contact\ContactPageLoader">
+            <argument type="service" id="Shopware\Storefront\Page\GenericPageLoader"/>
+            <argument type="service" id="event_dispatcher"/>
+            <argument type="service" id="salutation.repository"/>
+        </service>
+
+        <service id="Shopware\Storefront\Page\Sitemap\SitemapPageLoader">
+            <argument type="service" id="event_dispatcher"/>
+            <argument type="service" id="Shopware\Core\Content\Sitemap\SalesChannel\SitemapRoute"/>
+        </service>
+
+        <service id="Shopware\Storefront\Page\Cms\DefaultMediaResolver" decorates="Shopware\Core\Content\Media\Cms\DefaultMediaResolver">
+            <argument type="service" id="Shopware\Storefront\Page\Cms\DefaultMediaResolver.inner"/>
+            <argument type="service" id="Shopware\Core\Framework\Adapter\Translation\Translator"/>
+            <argument type="service" id="assets.packages"/>
+        </service>
+
+        <service id="Shopware\Storefront\Framework\Cache\CacheTracer" decorates="Shopware\Core\Framework\Adapter\Cache\CacheTracer">
+            <argument type="service" id="Shopware\Storefront\Framework\Cache\CacheTracer.inner"/>
+            <argument type="service" id="Shopware\Storefront\Theme\ThemeConfigValueAccessor"/>
+        </service>
+
+        <service id="Shopware\Storefront\Framework\Command\SalesChannelCreateStorefrontCommand">
+            <argument type="service" id="snippet_set.repository"/>
+            <argument type="service" id="Shopware\Core\Maintenance\SalesChannel\Service\SalesChannelCreator"/>
+
+            <tag name="console.command"/>
+        </service>
+
+        <service id="Shopware\Storefront\Framework\Cookie\CookieProviderInterface" class="Shopware\Storefront\Framework\Cookie\CookieProvider"/>
+
+        <service id="Shopware\Storefront\Framework\Cookie\AppCookieProvider" decorates="Shopware\Storefront\Framework\Cookie\CookieProviderInterface">
+            <argument type="service" id="Shopware\Storefront\Framework\Cookie\AppCookieProvider.inner"/>
+            <argument type="service" id="app.repository"/>
+        </service>
+
+        <service id="Shopware\Storefront\Framework\Captcha\CaptchaRouteListener">
+            <argument type="tagged" tag="shopware.storefront.captcha"/>
+            <argument type="service" id="Shopware\Storefront\Controller\ErrorController"/>
+            <argument type="service" id="Shopware\Core\System\SystemConfig\SystemConfigService"/>
+
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+        <service id="Shopware\Storefront\Framework\Captcha\HoneypotCaptcha">
+            <argument type="service" id="validator"/>
+
+            <tag name="shopware.storefront.captcha" priority="400"/>
+        </service>
+
+        <service id="Shopware\Storefront\Framework\Captcha\BasicCaptcha">
+            <argument type="service" id="request_stack"/>
+            <argument type="service" id="Shopware\Core\System\SystemConfig\SystemConfigService"/>
+
+            <tag name="shopware.storefront.captcha" priority="300"/>
+        </service>
+
+        <service id="Shopware\Storefront\Framework\Captcha\BasicCaptcha\BasicCaptchaGenerator"/>
+
+        <service id="shopware.captcha.client" class="GuzzleHttp\Client"/>
+
+        <service id="Shopware\Storefront\Framework\Captcha\GoogleReCaptchaV2">
+            <argument type="service" id="shopware.captcha.client"/>
+
+            <tag name="shopware.storefront.captcha" priority="200"/>
+        </service>
+
+        <service id="Shopware\Storefront\Framework\Captcha\GoogleReCaptchaV3">
+            <argument type="service" id="shopware.captcha.client"/>
+
+            <tag name="shopware.storefront.captcha" priority="100"/>
+        </service>
+
+        <service id="Shopware\Storefront\Framework\Routing\ResponseHeaderListener">
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+        <service id="Shopware\Storefront\Event\CartMergedSubscriber">
+            <argument type="service" id="translator"/>
+            <argument type="service" id="request_stack"/>
+
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+        <service id="Shopware\Storefront\Page\Wishlist\WishlistPageLoader">
+            <argument type="service" id="Shopware\Storefront\Page\GenericPageLoader"/>
+            <argument type="service" id="Shopware\Core\Checkout\Customer\SalesChannel\LoadWishlistRoute"/>
+            <argument type="service" id="event_dispatcher"/>
+        </service>
+
+        <service id="Shopware\Storefront\Page\Wishlist\GuestWishlistPageLoader">
+            <argument type="service" id="Shopware\Storefront\Page\GenericPageLoader"/>
+            <argument type="service" id="event_dispatcher"/>
+        </service>
+
+        <service id="Shopware\Storefront\Pagelet\Wishlist\GuestWishlistPageletLoader">
+            <argument type="service" id="Shopware\Core\Content\Product\SalesChannel\ProductListRoute"/>
+            <argument type="service" id="Shopware\Core\System\SystemConfig\SystemConfigService"/>
+            <argument type="service" id="event_dispatcher"/>
+            <argument type="service" id="Shopware\Core\Content\Product\SalesChannel\ProductCloseoutFilterFactory"/>
+        </service>
+
+        <service id="Shopware\Storefront\Framework\App\Template\IconTemplateLoader" decorates="Shopware\Core\Framework\App\Template\TemplateLoader">
+            <argument type="service" id="Shopware\Storefront\Framework\App\Template\IconTemplateLoader.inner"/>
+            <argument type="service" id="Shopware\Storefront\Theme\StorefrontPluginConfiguration\StorefrontPluginConfigurationFactory"/>
+            <argument type="service" id="Shopware\Core\Framework\App\Lifecycle\AppLoader"/>
+            <argument>%kernel.project_dir%</argument>
+        </service>
+
+        <service id="Shopware\Storefront\Framework\Twig\TwigAppVariable" decorates="twig.app_variable">
+            <argument type="service" id="Shopware\Storefront\Framework\Twig\TwigAppVariable.inner"/>
+            <argument>%shopware.twig.app_variable.allowed_server_params%</argument>
+        </service>
+
+    </services>
+</container>

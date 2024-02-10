@@ -1,0 +1,26 @@
+{% block component_head_analytics %}
+    {% block component_head_analytics_gtag %}
+        {% if storefrontAnalytics and storefrontAnalytics.isActive() %}
+            {% set trackingId = storefrontAnalytics.getTrackingId() %}
+
+            <script>
+                {% block component_head_analytics_gtag_config %}
+                    window.gtagActive = true;
+                    window.gtagURL = 'https://www.googletagmanager.com/gtag/js?id={{ trackingId }}';
+                    window.controllerName = '{{ controllerName|lower }}';
+                    window.actionName = '{{ controllerAction|lower }}';
+                    window.trackOrders = '{{ storefrontAnalytics.isTrackOrders() }}';
+                    window.gtagTrackingId = '{{ trackingId }}';
+                    window.dataLayer = window.dataLayer || [];
+                    window.gtagConfig = {
+                        'anonymize_ip': '{{ storefrontAnalytics.isAnonymizeIp() }}',
+                        'cookie_domain': 'none',
+                        'cookie_prefix': '_swag_ga',
+                    };
+
+                    function gtag() { dataLayer.push(arguments); }
+                {% endblock %}
+            </script>
+        {% endif %}
+    {% endblock %}
+{% endblock %}

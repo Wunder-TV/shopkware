@@ -1,0 +1,14 @@
+{% block page_account_order_item_detail_body %}
+    <div class="order-detail-content-list">
+        {% block page_account_order_item_detail_line_items %}
+            {% for lineItem in order.nestedLineItems %}
+                {% block page_account_order_item_detail_line_item %}
+                    {% sw_include '@Storefront/storefront/component/line-item/line-item.html.twig' with {
+                        displayMode: 'order',
+                        showRemoveButton: false
+                    } %}
+                {% endblock %}
+            {% endfor %}
+        {% endblock %}
+    </div>
+{% endblock %}
