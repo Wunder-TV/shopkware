@@ -1,0 +1,288 @@
+{
+    "Framework": {
+        "basePath": "vendor\/shopware\/core\/Framework\/",
+        "views": [
+            "Resources\/views"
+        ],
+        "technicalName": "framework",
+        "administration": {
+            "path": "Resources\/app\/administration\/src",
+            "entryFilePath": null,
+            "webpack": null
+        },
+        "storefront": {
+            "path": "Resources\/app\/storefront\/src",
+            "entryFilePath": null,
+            "webpack": null,
+            "styleFiles": []
+        }
+    },
+    "System": {
+        "basePath": "vendor\/shopware\/core\/System\/",
+        "views": [
+            "Resources\/views"
+        ],
+        "technicalName": "system",
+        "administration": {
+            "path": "Resources\/app\/administration\/src",
+            "entryFilePath": null,
+            "webpack": null
+        },
+        "storefront": {
+            "path": "Resources\/app\/storefront\/src",
+            "entryFilePath": null,
+            "webpack": null,
+            "styleFiles": []
+        }
+    },
+    "Content": {
+        "basePath": "vendor\/shopware\/core\/Content\/",
+        "views": [
+            "Resources\/views"
+        ],
+        "technicalName": "content",
+        "administration": {
+            "path": "Resources\/app\/administration\/src",
+            "entryFilePath": null,
+            "webpack": null
+        },
+        "storefront": {
+            "path": "Resources\/app\/storefront\/src",
+            "entryFilePath": null,
+            "webpack": null,
+            "styleFiles": []
+        }
+    },
+    "Checkout": {
+        "basePath": "vendor\/shopware\/core\/Checkout\/",
+        "views": [
+            "Resources\/views"
+        ],
+        "technicalName": "checkout",
+        "administration": {
+            "path": "Resources\/app\/administration\/src",
+            "entryFilePath": null,
+            "webpack": null
+        },
+        "storefront": {
+            "path": "Resources\/app\/storefront\/src",
+            "entryFilePath": null,
+            "webpack": null,
+            "styleFiles": []
+        }
+    },
+    "Maintenance": {
+        "basePath": "vendor\/shopware\/core\/Maintenance\/",
+        "views": [
+            "Resources\/views"
+        ],
+        "technicalName": "maintenance",
+        "administration": {
+            "path": "Resources\/app\/administration\/src",
+            "entryFilePath": null,
+            "webpack": null
+        },
+        "storefront": {
+            "path": "Resources\/app\/storefront\/src",
+            "entryFilePath": null,
+            "webpack": null,
+            "styleFiles": []
+        }
+    },
+    "Profiling": {
+        "basePath": "vendor\/shopware\/core\/Profiling\/",
+        "views": [
+            "Resources\/views"
+        ],
+        "technicalName": "profiling",
+        "administration": {
+            "path": "Resources\/app\/administration\/src",
+            "entryFilePath": null,
+            "webpack": null
+        },
+        "storefront": {
+            "path": "Resources\/app\/storefront\/src",
+            "entryFilePath": null,
+            "webpack": null,
+            "styleFiles": []
+        }
+    },
+    "Administration": {
+        "basePath": "vendor\/shopware\/administration\/",
+        "views": [
+            "Resources\/views"
+        ],
+        "technicalName": "administration",
+        "administration": {
+            "path": "Resources\/app\/administration\/src",
+            "entryFilePath": null,
+            "webpack": null
+        },
+        "storefront": {
+            "path": "Resources\/app\/storefront\/src",
+            "entryFilePath": null,
+            "webpack": null,
+            "styleFiles": []
+        }
+    },
+    "Elasticsearch": {
+        "basePath": "vendor\/shopware\/elasticsearch\/",
+        "views": [
+            "Resources\/views"
+        ],
+        "technicalName": "elasticsearch",
+        "administration": {
+            "path": "Resources\/app\/administration\/src",
+            "entryFilePath": null,
+            "webpack": null
+        },
+        "storefront": {
+            "path": "Resources\/app\/storefront\/src",
+            "entryFilePath": null,
+            "webpack": null,
+            "styleFiles": []
+        }
+    },
+    "Storefront": {
+        "basePath": "vendor\/shopware\/storefront\/",
+        "views": [
+            "Resources\/views"
+        ],
+        "technicalName": "storefront",
+        "administration": {
+            "path": "Resources\/app\/administration\/src",
+            "entryFilePath": "Resources\/app\/administration\/src\/main.js",
+            "webpack": null
+        },
+        "storefront": {
+            "path": "Resources\/app\/storefront\/src",
+            "entryFilePath": "Resources\/app\/storefront\/src\/main.js",
+            "webpack": null,
+            "styleFiles": [
+                "vendor\/shopware\/storefront\/Resources\/app\/storefront\/src\/scss\/base.scss",
+                "vendor\/shopware\/storefront\/Resources\/app\/storefront\/src\/scss\/skin\/shopware\/_base.scss",
+                "@Plugins"
+            ]
+        }
+    },
+    "SwagExtensionStore": {
+        "basePath": "custom\/plugins\/SwagExtensionStore\/\/src\/",
+        "views": [
+            "Resources\/views"
+        ],
+        "technicalName": "swag-extension-store",
+        "administration": {
+            "path": "Resources\/app\/administration\/src",
+            "entryFilePath": "Resources\/app\/administration\/src\/main.js",
+            "webpack": "Resources\/app\/administration\/build\/webpack.config.js"
+        },
+        "storefront": {
+            "path": "Resources\/app\/storefront\/src",
+            "entryFilePath": null,
+            "webpack": null,
+            "styleFiles": []
+        }
+    },
+    "SwagLanguagePack": {
+        "basePath": "custom\/plugins\/SwagLanguagePack\/\/src\/",
+        "views": [
+            "Resources\/views"
+        ],
+        "technicalName": "swag-language-pack",
+        "administration": {
+            "path": "Resources\/app\/administration\/src",
+            "entryFilePath": "Resources\/app\/administration\/src\/main.js",
+            "webpack": "Resources\/app\/administration\/build\/webpack.config.js"
+        },
+        "storefront": {
+            "path": "Resources\/app\/storefront\/src",
+            "entryFilePath": null,
+            "webpack": null,
+            "styleFiles": [
+                "custom\/plugins\/SwagLanguagePack\/\/src\/Resources\/app\/storefront\/src\/scss\/base.scss"
+            ]
+        }
+    },
+    "NetiNextCmsElementBuilder": {
+        "basePath": "vendor\/store.shopware.com\/netinextcmselementbuilder\/\/src\/",
+        "views": [
+            "Resources\/views"
+        ],
+        "technicalName": "neti-next-cms-element-builder",
+        "administration": {
+            "path": "Resources\/app\/administration\/src",
+            "entryFilePath": "Resources\/app\/administration\/src\/main.js",
+            "webpack": null
+        },
+        "storefront": {
+            "path": "Resources\/app\/storefront\/src",
+            "entryFilePath": "Resources\/app\/storefront\/src\/main.js",
+            "webpack": null,
+            "styleFiles": [
+                "vendor\/store.shopware.com\/netinextcmselementbuilder\/\/src\/Resources\/app\/storefront\/src\/scss\/base.scss"
+            ]
+        }
+    },
+    "SwagPayPal": {
+        "basePath": "custom\/plugins\/SwagPayPal\/\/src\/",
+        "views": [
+            "Resources\/views"
+        ],
+        "technicalName": "swag-pay-pal",
+        "administration": {
+            "path": "Resources\/app\/administration\/src",
+            "entryFilePath": "Resources\/app\/administration\/src\/main.js",
+            "webpack": "Resources\/app\/administration\/build\/webpack.config.js"
+        },
+        "storefront": {
+            "path": "Resources\/app\/storefront\/src",
+            "entryFilePath": "Resources\/app\/storefront\/src\/main.js",
+            "webpack": "Resources\/app\/storefront\/build\/webpack.config.js",
+            "styleFiles": [
+                "custom\/plugins\/SwagPayPal\/\/src\/Resources\/app\/storefront\/src\/scss\/base.scss"
+            ]
+        }
+    },
+    "Klubshop2023": {
+        "basePath": "custom\/plugins\/Klubshop2023\/\/src\/",
+        "views": [
+            "Resources\/views"
+        ],
+        "technicalName": "klubshop2023",
+        "administration": {
+            "path": "Resources\/app\/administration\/src",
+            "entryFilePath": null,
+            "webpack": null
+        },
+        "storefront": {
+            "path": "Resources\/app\/storefront\/src",
+            "entryFilePath": "Resources\/app\/storefront\/src\/main.js",
+            "webpack": null,
+            "styleFiles": [
+                "custom\/plugins\/Klubshop2023\/src\/Resources\/app\/storefront\/src\/scss\/overrides.scss",
+                "@Storefront",
+                "custom\/plugins\/Klubshop2023\/src\/Resources\/app\/storefront\/src\/scss\/base.scss"
+            ]
+        }
+    },
+    "KlubshopConfigurator": {
+        "basePath": "custom\/plugins\/KlubshopConfigurator\/\/src\/",
+        "views": [
+            "Resources\/views"
+        ],
+        "technicalName": "klubshop-configurator",
+        "administration": {
+            "path": "Resources\/app\/administration\/src",
+            "entryFilePath": "Resources\/app\/administration\/src\/main.js",
+            "webpack": "Resources\/app\/administration\/build\/webpack.config.js"
+        },
+        "storefront": {
+            "path": "Resources\/app\/storefront\/src",
+            "entryFilePath": "Resources\/app\/storefront\/src\/main.js",
+            "webpack": "Resources\/app\/storefront\/build\/webpack.config.js",
+            "styleFiles": [
+                "custom\/plugins\/KlubshopConfigurator\/\/src\/Resources\/app\/storefront\/src\/scss\/base.scss"
+            ]
+        }
+    }
+}

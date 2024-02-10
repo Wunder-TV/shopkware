@@ -1,4 +1,0 @@
-storefront:
-    theme:
-        file_delete_delay: 900
-        auto_prefix_css: false

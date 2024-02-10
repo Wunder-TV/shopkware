@@ -1,0 +1,77 @@
+{
+    "license": "proprietary",
+    "type": "project",
+    "require": {
+        "php": "~8.2.0",
+        "composer-runtime-api": "^2.0",
+        "shopware/administration": "v6.5.8.4",
+        "shopware/core": "v6.5.8.4",
+        "shopware/elasticsearch": "v6.5.8.4",
+        "shopware/storefront": "v6.5.8.4",
+        "symfony/flex": "~2",
+        "symfony/runtime": "^5.0|^6.0"
+    },
+    "repositories": {
+        "shopware-packages": {
+            "type": "composer",
+            "url": "https://packages.shopware.com"
+        },
+        "0": {
+            "type": "path",
+            "url": "custom/plugins/*",
+            "options": {
+                "symlink": true
+            }
+        },
+        "1": {
+            "type": "path",
+            "url": "custom/plugins/*/packages/*",
+            "options": {
+                "symlink": true
+            }
+        },
+        "2": {
+            "type": "path",
+            "url": "custom/static-plugins/*",
+            "options": {
+                "symlink": true
+            }
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "config": {
+        "allow-plugins": {
+            "symfony/flex": true,
+            "symfony/runtime": true,
+            "pickware/dependency-loader": true
+        },
+        "optimize-autoloader": true,
+        "sort-packages": true
+    },
+    "scripts": {
+        "auto-scripts": {
+            "assets:install": "symfony-cmd"
+        },
+        "post-install-cmd": [
+            "@auto-scripts"
+        ],
+        "post-update-cmd": [
+            "@auto-scripts"
+        ]
+    },
+    "extra": {
+        "symfony": {
+            "allow-contrib": true,
+            "endpoint": [
+                "https://raw.githubusercontent.com/shopware/recipes/flex/main/index.json",
+                "flex://defaults"
+            ]
+        }
+    },
+    "require-dev": {
+        "phpstan/phpstan": "^1.10",
+        "phpunit/phpunit": "^10.1",
+        "shopware/dev-tools": "^1.0"
+    }
+}

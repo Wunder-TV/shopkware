@@ -1,0 +1,75 @@
+version: "3.8"
+
+name: klubshop-shopware
+
+x-shopware-base: &shopware_base
+  image: shopware_app:${OCY_BUILD_TAG}
+  build:
+    context: ../container/
+    dockerfile: Dockerfile
+  networks:
+    - backend
+  restart: always
+  env_file: 
+  - "./app/.env"
+  - ".env"
+
+services:
+  app:
+    <<: *shopware_base
+    networks:
+      - backend
+      - frontend
+    volumes:
+      - "./app/logs:/app/var/log"
+      - "./app/files:/app/files"
+      - "./app/media:/app/public/media"
+      - "./app/sitemap:/app/public/sitemap"
+      - "./app/caddy:/data/caddy"
+    ports:
+      - "80:80"
+      - "443:443"
+
+  db:
+    image: mysql:8.0@sha256:8b8835a2c32cd7357a5d2ea4b49ad870ff519c8c1d4add362803feddf4a0a973
+    restart: always
+    env_file:
+      - './db/.env'
+    networks:
+      - backend
+    volumes:
+      - './db/data:/var/lib/mysql'
+
+  queue_worker_async:
+    <<: *shopware_base
+    # See: https://developer.shopware.com/docs/guides/hosting/infrastructure/message-queue#systemd-example
+    command: "php ./bin/console messenger:consume --time-limit=1800 --memory-limit=512M async"
+    deploy:
+      mode: replicated
+      replicas: 5
+
+  queue_worker_error:
+    <<: *shopware_base
+    # See: https://developer.shopware.com/docs/guides/hosting/infrastructure/message-queue#systemd-example
+    command: "php ./bin/console messenger:consume --time-limit=1800 --memory-limit=512M failed"
+    deploy:
+      mode: replicated
+      replicas: 5
+
+  scheduled_tasks:
+    <<: *shopware_base
+    command: "php ./bin/console scheduled-task:run --time-limit=600"
+
+  redis:
+    image: redis:7.2.2@sha256:f75c773aa7efa73c5ec32b9af2aeeb184b24ab3a766a16d951b29df92e600b8a
+    restart: always
+    networks:
+      - backend
+    volumes:
+      - ./redis/data:/data
+
+networks:
+  frontend:
+    external: true
+  backend:
+

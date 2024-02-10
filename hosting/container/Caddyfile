@@ -1,0 +1,50 @@
+# allow any DNS/Domain pointing to this server getting a TLS-Cert
+{
+    on_demand_tls {
+        ask https://mock.httpstatus.io/200
+    }
+}
+
+:80, :443 {
+# TLS-certs created while first attempt for new SNI (Domain/DNS)
+   tls {
+           on_demand
+       }
+# ensure https
+@http {
+		protocol http
+	}
+	redir @http https://{host}{uri}
+
+# ensure safety of shopware installation
+# https://developer.shopware.com/docs/guides/installation/requirements.html
+
+  header {
+    X-Frame-Options DENY
+    Referrer-Policy no-referrer-when-downgrade
+  }
+
+  @svg {
+    file
+    path *.svg
+  }
+
+  header @svg Content-Security-Policy "script-src 'none'"
+
+  @default {
+    not path /theme/* /media/* /thumbnail/* /bundles/* /css/* /fonts/* /js/* /recovery/* /sitemap/*
+  }
+
+# root-path within the container
+  root * /app/public
+  
+# php_fastcgi config -> we use the local unix-socket
+  php_fastcgi unix//tmp/php-fpm.sock {
+    trusted_proxies private_ranges
+  }
+  encode zstd gzip
+  file_server
+}
+
+# enable logoutput to stdout/stderr
+log
